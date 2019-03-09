@@ -1,32 +1,61 @@
-"""
-This is some text that should not be parsed as code.
+fr"""
 
-<<say hello world>>=
-print("Hello World")
-@
+This is an attempt to write a more verbose version of the "self-hosted" literal
+programming code that is at the bottom of this file. In other words, when
+running this file with `python {__file__}` it should produce a python program
+that is a more well-structured version of the code defined at the end of this
+file.
 
-Try to add to the hello world section by using the `>>+` syntax.
+Defining the structure of the final output file.
 
-<<say hello world>>+
-print("Addition to hello world.")
-@
+<<literal_python.py>>=
 
-These should all add up in the end, ensure they do.
+<<import modules>>
 
-<<say hello world>>+
-print("Second addition to hello world.")
-@
+def main(args):
+  <<setup dictionary of tags>>
+  <<do a recursive replace of all the tags>>
+  <<write all defined files to disk>>
 
-Define the file that uses the say hello world segment.
-
-<<hello_world.py>>=
-def main():
-  # Comment that should stay in palace.
-  <<say hello world>>
 if __name__ == "__main__":
-  main()
+  <<read command line arguments>>
+  main(args)
 @
 
+Let's begin with defining what is read from the command line.
+First we need to import the sys module in order to read the command line
+arguments.
+
+<<import modules>>=
+import sys
+@
+
+Assuming the arguments consists of a list of files that should be parsed, we
+pass them along, removing the name of the currently running file at index 0.
+
+<<read command line arguments>>=
+args = sys.argv[1:]
+@
+
+We probably want to keep each files namespace isolated, which means a
+dictionary per filename in the passed along list of files.
+
+<<setup dictionary of tags>>=
+dictionaries = []
+for filename in args:
+  with open(filename, 'r') as fh:
+    data_file = fh.read()
+    <<construct list of tags>>
+    <<add to dictionaries list>>
+@
+
+In order to support both the define `>>=` and append `>>+` syntax, all the
+defines and appends tags need to be merged together.
+
+<<construct list of tags>>=
+<<find all scopes and tags>>
+<<merge all tags>>
+@
 """
 import re, os
 ms=[m.split('\n',1) for m in re.findall(r"<<.*?@",open(__file__).read(),re.S)[:-1]]
