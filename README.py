@@ -58,25 +58,18 @@ defines and appends tags need to be merged together.
 @
 """
 import re, os
-ms=[m.split('\n',1) for m in re.findall(r"<<.*?@",open(__file__).read(),re.S)[:-1]]
-md={k[:-1]:'' for k,v in ms}
-for k,v in ms:
-  md[k[:-1]] += v[:-1]
-h_prev=None
+rs,rt,rd,nj,rf=[r"[ \t]",r"<<.*?>>",r"<<.*?@",'\n'.join,re.findall]
+ds=rf(f"{rd}",open(__file__).read(),re.S)
+ds={k[:-1]:v[:-1] for k,v in [m.split('\n',1) for m in ds[:-1]]}
+
 while True:
-  h_prev=hash(str(md))
-  for k,v in md.items():
-    for pat,sub in md.items():
-      ind = [m.strip('\n') for m in re.findall(rf"\s+{pat}",v)]
-      if ind:
-        ind = len(ind[0]) - len(ind[0].lstrip())
-        ls = sub.splitlines()
-        sub = os.linesep.join(ls[:1] + [' '*ind+l.strip() for l in ls[1:]])
-      md[k] = re.sub(pat,sub,md[k])
-  if h_prev == hash(str(md)):
+  dh = hash(str(ds))
+  for k,v in ds.items():
+    for i,t in [t for t in rf(f"({rs}*)({rt}){rs}?",v,re.S) if t[1] in ds]:
+      ds[k] = re.sub(f"{rs}*"+t,nj([i+l for l in ds[t].splitlines()]),ds[k])
+  if dh == hash(str(ds)):
     break
 if not os.path.isdir("out"):
-  os.makedirs("out")
-for k,v in md.items():
-  if '.' in k:
-    open(os.path.join("out", k[2:-2]), 'w').write(v)
+  os.mkdir("out")
+for k,v in [(k,v) for k,v in ds.items() if k.count('.') > 0]:
+  open(os.path.join("out", k[2:-2]), 'w').write(v)
