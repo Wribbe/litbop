@@ -20,7 +20,7 @@ This is the repository for **litbop** -- **lit**erate **bo**otstrapped **p**ytho
 
 ### Write literate code:
 
-See the [syntax](#syntax) section.
+See the [writing the parser](#writing-the-parser) section.
 
 ## What:
 
@@ -43,7 +43,7 @@ See the [syntax](#syntax) section.
 ## Why:
 
 For me, the idea of literate programming is immensely intriguing ever since I
-first heard of it. Can't remember where I stumbled over it first, but possible
+first heard of it. I can't remember where I first stumbled over it, but possible
 contenders include:
 > **Physically Based Rendering**, Third Edition describes both the mathematical
 > theory behind a modern photorealistic rendering system as well as its
@@ -64,9 +64,8 @@ contenders include:
 > and designed to be simple, easily extensible and language independent.
 -- [Wikipedia](https://en.wikipedia.org/wiki/Noweb)
 
-I feel there is this constant pull towards literate programming. At least once a year
-I try to setup and use literate programming for a smaller project, but it
-always peters out.
+At least once a year I try to setup and use literate programming for a smaller
+project, but it always peters out.
 
 ### Here we go again!
 
@@ -88,7 +87,9 @@ to other formats through [pandoc](https://pandoc.org) and renders nicely in the
 repository on Github, but you can of course use any other python-readable text
 format you want.
 
-## Syntax:
+## Writing the parser:
+
+### Output to files:
 
 Lets begin with defining a `.gitignore` file for this repository.
 ```
@@ -112,32 +113,37 @@ together with its shebang, docstring and general structure.
 <<import modules>>
 
 def main(args):
-  <<read files from args>>
-  <<find and resolve tags>>
-  <<write files to disk>>
+  for filename in args:
+    <<parse and resolve tags>>
+    <<write source files to disk>>
 
 if __name__ == "__main__":
   <<read arguments from commandline>>
-  <<call main method>>
+  main(args)
 @
 ```
 
+Notice the `out/` part of the previously defined tag, litbop accepts any *nix
+path on the format `<dir1>/.../<dirN>/<file>`, creating any missing
+directories. If the file defined in the path already exists, litbop will
+replace it without warning.
+
+The parser will only try to create files out of tags that have a `.` in them,
+which is usually automatically the case with source files like `.py` or `.c`.
+However, if you want to write to a file to the project-root that does not have
+a `.` in its name, i.e. a `Makefile`, you wold have to name it `./Makefile` to
+sort it out.
+
+### Defining tags:
+
 Tags ending with `=` are definitions. The parser will take everything between
 the `=` and `@` to mean the definition of the tagname,
-`out/litbop_bootstrapped.py` in this case. The tags above without a trailing
-`=` are substitution tags which means, if they are defined somewhere in the
-file, the tag will be replaced with its corresponding definition. In the case of
-using a tag that is not yet defined, the unmodified tag will be written to the
-file in question.
+`out/litbop_bootstrapped.py` in this case. Tags without a trailing `=` or `+`
+are substitution tags, and the parser will try to replace them with their
+corresponding definition. If there is no definition for a tag, the unmodified
+tag will be written to file without substitution.
 
-Notice the `out/` part of the previously defined tag. Litbop will accept any
-*nix path on the format `<dir1>/.../<dirN>/<file>` and create the
-nested directory-structure if it does not already exist, and write to the
-given `<file>`, replacing anything that already exists. The parser will only
-try to create files out of tags that have a `.` in them, which is usually
-automatically the case with source files like `.py` or `.c`. However, if you
-want to write to a file to the project-root that does not have a `.` in its
-name, i.e. a `Makefile`, you wold have to name it `./Makefile` to sort it out.
+### Appending to defined tags:
 
 Since the code now creates the output directory `out` for us, lets add that to
 the ignore file in order to avoid committing generated code to the repository.
@@ -148,11 +154,78 @@ out/
 @
 ```
 
-The complete content of the `.gitignore` is no defined as:
+The complete content of the `.gitignore` is now defined as:
 ```
 .gitignore
 out/
 ```
+
+Any tag with a trailing `+` will append to a previously defined tag with the same
+name. Definitions and appends for the same tag-name do not need to be in
+proximity of each other. When a tag is substituted, the definition, together
+with any appends will be concatenated and replace the tag in question.
+
+### Reading arguments from the command line:
+
+The main idea is that the parser should parse and assemble source files based
+on any file or files that are passed to it.
+
+```python
+<<read arguments from commandline>>=
+args = sys.argv[1:]
+@
+```
+
+Which makes it clear that the `sys` module needs so be imported.
+
+```python
+<<import modules>>=
+import sys
+@
+```
+
+### Non sequentiality, nested tags and indentation:
+
+Lets jump to the part where the files are written in order to demonstrate the
+capabilities of working with different parts of the code out of order. First
+lets define up the `write source files to disk` tag into a for-loop and
+sub-tags.
+
+```python
+<<write source files to disk>>=
+for path_file, content_file in parsed_file_data.items():
+  <<create dir structure if missing>>
+  <<write content to filepath>>
+@
+```
+
+Running `python README.md` right now, together with `cat
+out/litbop_bootstrapped.py` would produce the following output:
+
+```python
+#!/usr/bin/env python3
+""" Readable version of litbop bootstrapper code. """
+import sys
+
+def main(args):
+  for filename in args:
+    <<parse and resolve tags>>
+    for path_file, content_file in parsed_file_data.items():
+      <<create dir structure if missing>>
+      <<write content to filepath>>
+
+if __name__ == "__main__":
+  args = sys.argv[1:]
+  main(args)
+```
+
+Since the tag `write source files to disk` is defined, it is replaced by the
+definition at the indentation level that the tag had. Also notice that all the
+definitions written this far have replaced their tags and undefined tags remain
+unchanged. Lets leave it like that for now.
+
+### Parsing and resolving tags:
+
 
 # The bootstrapping code.
 
