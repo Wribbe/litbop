@@ -1,5 +1,6 @@
 """
-# Literal python.
+# Welcome!
+this is to **Lit**erate **bo**otstrapped **p**ython -- **litbop**.
 
 This is an attempt to write a more verbose version of the "self-hosted" literal
 programming code that is at the bottom of this file. In other words, when
