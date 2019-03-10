@@ -114,6 +114,12 @@ I want a `Makefile`.
 @
 ```
 
+# The bootstrapping part.
+
+This is the end of the document, and the **very** unreadable code beneath,
+together with the absolutely last line, is what makes this little project tick.
+Might have gotten a bit carried away when trying to minimize it, one should
+probably not do __*ANYTHING*__ of what is done below, don't use as reference!
 
 ```python
 import re, os; from re import S as rS; from os.path import dirname as opd
