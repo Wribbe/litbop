@@ -3,12 +3,12 @@
 
 This is an attempt to write a more verbose version of the "self-hosted" literal
 programming code that is at the bottom of this file. In other words, when
-running this file with `python <this file>` it should produce a python program
+running this file with `python README.md` it should produce a python program
 that is a more well-structured version of the code defined at the end of this
 file.
 
 ```python
-<<hello_world.py>>=
+<<out/hello_world.py>>=
 <<say hello world>>
 @
 ```
@@ -34,7 +34,7 @@ print("HELLO3")
 Defining the structure of the final output file.
 
 ```python
-<<literal_python.py>>=
+<<out/literal_python.py>>=
 
 <<import modules>>
 
@@ -92,9 +92,32 @@ defines and appends tags need to be merged together.
 @
 ```
 
+## Housekeeping.
+
+I want a `.gitignore` file.
+
+```
+<<.gitignore>>=
+Makefile
+out
+*.pdf
+*.html
+*.tex
+.gitignore
+@
+```
+
+I want a `Makefile`.
+
+```make
+<<./Makefile>>=
+@
+```
+
+
 ```python
-import re, os; from re import S as rS, findall as rf
-rs,rt,nj,dd=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read()]
+import re, os; from re import S as rS; from os.path import dirname as opd
+rs,rt,nj,dd,rf=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read(),re.findall]
 dt={t:''.join(rf(f"{t}[+=]\s?(.*?)@",dd,rS)) for t in rf(f"({rt}).*?@",dd,rS)}
 
 while True:
@@ -103,11 +126,11 @@ while True:
     for i,t in [t for t in rf(f"({rs}*)({rt}){rs}?",v,rS) if t[1] in dt]:
       dt[k] = re.sub(f"{rs}*"+t,nj([i+l for l in dt[t].splitlines()]),dt[k])
   if dh == hash(str(dt)):
-    break
-if not os.path.isdir("out"):
-  os.mkdir("out")
-for k,v in [(k,v) for k,v in dt.items() if '.' in k]:
-  open(os.path.join("out", k[2:-2]), 'w').write(v)
+    dt = {k[2:-2]:v for k,v in dt.items() if '*' not in k}; break
+for dn,k,v in [(opd(k),k,v) for k,v in dt.items() if '.' in k]:
+  if dn and not os.path.isdir(dn):
+    os.makedirs(dn)
+  open(k,'w').write(v)
 ```
 """
 exec(''.join(open(__file__).readlines()[-18:-3]))
