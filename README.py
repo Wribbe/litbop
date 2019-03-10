@@ -1,10 +1,25 @@
-fr"""
-
+"""
 This is an attempt to write a more verbose version of the "self-hosted" literal
 programming code that is at the bottom of this file. In other words, when
 running this file with `python {__file__}` it should produce a python program
 that is a more well-structured version of the code defined at the end of this
 file.
+
+<<hello_world.py>>=
+<<say hello world>>
+@
+
+<<say hello world>>=
+print("HELLO1")
+@
+
+<<say hello world>>+
+print("HELLO2")
+@
+
+<<say hello world>>+
+print("HELLO3")
+@
 
 Defining the structure of the final output file.
 
@@ -57,19 +72,18 @@ defines and appends tags need to be merged together.
 <<merge all tags>>
 @
 """
-import re, os
-rs,rt,rd,nj,rf=[r"[ \t]",r"<<.*?>>",r"<<.*?@",'\n'.join,re.findall]
-ds=rf(f"{rd}",open(__file__).read(),re.S)
-ds={k[:-1]:v[:-1] for k,v in [m.split('\n',1) for m in ds[:-1]]}
+import re, os; from re import S as rS, findall as rf
+rs,rt,nj,dd=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read()]
+dt={t:''.join(rf(f"{t}[+=]\s?(.*?)@",dd,rS)) for t in rf(f"({rt}).*?@",dd,rS)}
 
 while True:
-  dh = hash(str(ds))
-  for k,v in ds.items():
-    for i,t in [t for t in rf(f"({rs}*)({rt}){rs}?",v,re.S) if t[1] in ds]:
-      ds[k] = re.sub(f"{rs}*"+t,nj([i+l for l in ds[t].splitlines()]),ds[k])
-  if dh == hash(str(ds)):
+  dh = hash(str(dt))
+  for k,v in dt.items():
+    for i,t in [t for t in rf(f"({rs}*)({rt}){rs}?",v,rS) if t[1] in dt]:
+      dt[k] = re.sub(f"{rs}*"+t,nj([i+l for l in dt[t].splitlines()]),dt[k])
+  if dh == hash(str(dt)):
     break
 if not os.path.isdir("out"):
   os.mkdir("out")
-for k,v in [(k,v) for k,v in ds.items() if k.count('.') > 0]:
+for k,v in [(k,v) for k,v in dt.items() if '.' in k]:
   open(os.path.join("out", k[2:-2]), 'w').write(v)
