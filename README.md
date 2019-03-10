@@ -91,7 +91,8 @@ defines and appends tags need to be merged together.
 <<merge all tags>>
 @
 ```
-"""
+
+```python
 import re, os; from re import S as rS, findall as rf
 rs,rt,nj,dd=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read()]
 dt={t:''.join(rf(f"{t}[+=]\s?(.*?)@",dd,rS)) for t in rf(f"({rt}).*?@",dd,rS)}
@@ -107,3 +108,6 @@ if not os.path.isdir("out"):
   os.mkdir("out")
 for k,v in [(k,v) for k,v in dt.items() if '.' in k]:
   open(os.path.join("out", k[2:-2]), 'w').write(v)
+```
+"""
+exec(''.join(open(__file__).readlines()[-18:-3]))
