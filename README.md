@@ -209,10 +209,10 @@ import sys
 
 def main(args):
   for filename in args:
-    <<parse and resolve tags>>
+    \<\<parse and resolve tags\>\>
     for path_file, content_file in parsed_file_data.items():
-      <<create dir structure if missing>>
-      <<write content to filepath>>
+      \<\<create dir structure if missing\>\>
+      \<\<write content to filepath\>\>
 
 if __name__ == "__main__":
   args = sys.argv[1:]
@@ -226,6 +226,75 @@ unchanged. Lets leave it like that for now.
 
 ### Parsing and resolving tags:
 
+In order to find the tag segments, this solution uses regular expressions,
+available through the `re` module.
+
+```python
+<<import modules>>+
+import re
+@
+```
+
+The following defines regular expression matches for a regular tag, a
+defining or appending tag, and a match for a tag-scope.
+
+```python
+<<parse and resolve tags>>=
+# Define regular expression matches for tags and scopes.
+re_tag_match = "\<\<.*?\>\>"
+re_tag_def_match = f"{re_tag_match}[+=]"
+re_tag_scope = fr"({re_tag_def_match})(.*?)\at"
+@
+```
+
+After reading the data from the file, `re.findall()` can be used to find
+all the scopes in the current data. The `re.DOTALL` is necessary in order to
+make the `.*` match include newlines, which is needed to capture the whole
+scope.
+
+```python
+<<parse and resolve tags>>+
+data_file = open(filename).read()
+tag_scopes_in_data = re.findall(re_tag_scope, data_file, re.DOTALL)
+@
+```
+
+Having a list of `(tag-name, scope-text)` tuples, all the appends need to be
+consolidated with the corresponding define tag. Since they have the same name,
+stripping the last character and concatenating their scopes into another
+dictionary works fine.
+
+First, create a dictionary keyed on the tag-names, with a value of the empty
+string `""`. Since the tags are on the form `\<\<tag-name\>\>c` where `c` is an
+additional character stripping the first two characters and the last three
+with: `tag[2:-3]` results in `tag-name` being returned.
+
+```python
+<<parse and resolve tags>>+
+#print(tag_scopes_in_data)
+tags_concatenated = {k[2:-3]:"" for k,s in tag_scopes_in_data}
+print(tags_concatenated)
+@
+```
+
+```python
+<<parse and resolve tags>>+
+#for tag in tag_scopes_in_data:
+#  print(tag)
+parsed_file_data = {}
+@
+```
+
+```python
+<<create dir structure if missing>>=
+pass
+@
+```
+
+```python
+<<write content to filepath>>=
+@
+```
 
 # The bootstrapping code.
 
@@ -249,7 +318,7 @@ while True:
 for dn,k,v in [(opd(k),k,v) for k,v in dt.items() if '.' in k]:
   if dn and not os.path.isdir(dn):
     os.makedirs(dn)
-  open(k,'w').write(v)
+  open(k,'w').write(v.replace('\<','<').replace('\>','>').replace('\at', '@'))
 ```
 '''
 exec(''.join(open(__file__).readlines()[-18:-3]))
