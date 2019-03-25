@@ -243,8 +243,8 @@ defining or appending tag, and a match for a tag-scope.
 <<defined regexes>>=
 # Define regular expression matches for tags and scopes.
 re_tag_match = "<<.*?>>"
-re_tag_def_match = f"{re_tag_match}[+=]"
-re_tag_scope = fr"({re_tag_def_match})(.*?)[\\n\\r]*@"
+re_tag_def_match = f"\\s*({re_tag_match}[+=])"
+re_tag_scope = fr"{re_tag_def_match}\\s*(.*?)\\s*^@"
 @
 ```
 
@@ -257,7 +257,7 @@ scope.
 <<parse and resolve tags>>=
 <<defined regexes>>
 data_file = open(filename).read()
-data_tag_scopes = re.findall(re_tag_scope, data_file, re.DOTALL)
+data_tag_scopes = re.findall(re_tag_scope, data_file, re.DOTALL+re.MULTILINE)
 @
 ```
 
@@ -482,8 +482,8 @@ probably not do __*ANYTHING*__ of what is done below, don't use as reference!
 
 ```python
 import re, os; from re import S,M; from os.path import dirname as opd
-rs,rt,nj,dd,rf=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read(),re.findall]
-dt={t:''.join(rf(f"{t}[+=]\s?(.*?)@",dd,S)) for t in rf(f"({rt}).*?^@",dd,S+M)}
+rs,rt,nj,d,rf=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read(),re.findall]
+dt={t:''.join(rf(f"{t}[+=]\s?(.*?)^@",d,S+M)) for t in rf(f"({rt}).*?^@",d,S+M)}
 while True:
   dh = hash(str(dt))
   for k,v in dt.items():
