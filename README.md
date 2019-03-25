@@ -116,6 +116,7 @@ def main(args):
   for filename in args:
     <<parse and resolve tags>>
     <<write source files to disk>>
+  <<execute shell commands>>
 
 if __name__ == "__main__":
   <<read arguments from commandline>>
@@ -432,11 +433,9 @@ with open(path_file, 'w') as fh:
 @
 ```
 
-### Bootstrap specific functionality.
+### Ability to run shell-functions from snippet.
 
-Define an `exec` tag, this will be executed by the bootstrapping code. This
-functionality is not replicated in the generated file. Use it to create a
-symbolic link and set the generated script as executable.
+Define an `exec` tag, this will be executed by the parser.
 
 ```shell
 <<exec>>=
@@ -451,6 +450,28 @@ Add symbolic link to `.gitignore` file.
 litbop
 @
 ```
+
+If there are any commands defined in the `exec` tag, execute them. The
+assumption is that there is one command per line in the supplied data.
+
+```python
+<<execute shell commands>>=
+commands = data_file_resolved.get('exec')
+if not commands:
+  return
+for command in commands.splitlines():
+  subprocess.run(command.split())
+@
+```
+
+Import the subprocess module.
+
+```python
+<<import modules>>+
+import subprocess
+@
+```
+
 
 # The bootstrapping code.
 
