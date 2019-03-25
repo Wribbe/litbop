@@ -243,8 +243,7 @@ defining or appending tag, and a match for a tag-scope.
 # Define regular expression matches for tags and scopes.
 re_tag_match = "\<\<.*?\>\>"
 re_tag_def_match = f"{re_tag_match}[+=]"
-re_newline = r"[\\n\\r]"
-re_tag_scope = fr"({re_tag_def_match})(.*?){re_newline}*\at"
+re_tag_scope = fr"({re_tag_def_match})(.*?)[\\n\\r]*\at"
 @
 ```
 
