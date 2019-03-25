@@ -209,10 +209,10 @@ import sys
 
 def main(args):
   for filename in args:
-    \<\<parse and resolve tags\>\>
+    <<parse and resolve tags>>
     for path_file, content_file in data_file_resolved.items():
-      \<\<create dir structure if missing\>\>
-      \<\<write content to filepath\>\>
+      <<create dir structure if missing>>
+      <<write content to filepath>>
 
 if __name__ == "__main__":
   args = sys.argv[1:]
@@ -267,9 +267,9 @@ stripping the last character and concatenating their scopes into another
 dictionary works fine.
 
 First, create a dictionary keyed on the tag-names, with a value of the empty
-string `""`. Since the tags are on the form `<\<tag-name>\>c` where `c` is an
+string `""`. Since the tags are on the form `<<tag-name>>c` where `c` is an
 additional character stripping the first two characters and the last three
-with: `tag[0:-1]` results in `<\<tag-name>\>` being returned.
+with: `tag[0:-1]` results in `<<tag-name>>` being returned.
 
 ```python
 <<parse and resolve tags>>+
