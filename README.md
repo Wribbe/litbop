@@ -433,6 +433,26 @@ with open(path_file, 'w') as fh:
 @
 ```
 
+### Bootstrap specific functionality.
+
+Define an `exec` tag, this will be executed by the bootstrapping code. This
+functionality is not replicated in the generated file. Use it to create a
+symbolic link and set the generated script as executable.
+
+```shell
+<<exec>>=
+chmod +x out/litbop_bootstrapped.py
+ln -rsf out/litbop_bootstrapped.py litbop
+@
+```
+Add symbolic link to `.gitignore` file.
+
+```shell
+<<.gitignore>>+
+litbop
+@
+```
+
 # The bootstrapping code.
 
 This is the end of the document, and the **very** unreadable code below,
@@ -444,7 +464,6 @@ probably not do __*ANYTHING*__ of what is done below, don't use as reference!
 import re, os; from re import S as rS; from os.path import dirname as opd
 rs,rt,nj,dd,rf=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read(),re.findall]
 dt={t:''.join(rf(f"{t}[+=]\s?(.*?)@",dd,rS)) for t in rf(f"({rt}).*?@",dd,rS)}
-
 while True:
   dh = hash(str(dt))
   for k,v in dt.items():
@@ -456,6 +475,7 @@ for dn,k,v in [(opd(k),k,v) for k,v in dt.items() if '.' in k]:
   if dn and not os.path.isdir(dn):
     os.makedirs(dn)
   open(k,'w').write(v.replace('\<','<').replace('\>','>').replace('\at', '@'))
+import subprocess as sp; [sp.run(c.split()) for c in dt['exec'].splitlines()]
 ```
 '''
 exec(''.join(open(__file__).readlines()[-18:-3]))
