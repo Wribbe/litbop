@@ -176,7 +176,7 @@ args = sys.argv[1:]
 @
 ```
 
-Which makes it clear that the `sys` module needs so be imported.
+Import the `sys` module.
 
 ```python
 <<import modules>>=
