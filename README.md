@@ -241,7 +241,7 @@ defining or appending tag, and a match for a tag-scope.
 ```python
 <<defined regexes>>=
 # Define regular expression matches for tags and scopes.
-re_tag_match = "\<\<.*?\>\>"
+re_tag_match = "<<.*?>>"
 re_tag_def_match = f"{re_tag_match}[+=]"
 re_tag_scope = fr"({re_tag_def_match})(.*?)[\\n\\r]*@"
 @
@@ -473,7 +473,7 @@ while True:
 for dn,k,v in [(opd(k),k,v) for k,v in dt.items() if '.' in k]:
   if dn and not os.path.isdir(dn):
     os.makedirs(dn)
-  open(k,'w').write(v.replace('\<','<').replace('\>','>'))
+  open(k,'w').write(v)
 import subprocess as sp; [sp.run(c.split()) for c in dt['exec'].splitlines()]
 ```
 '''
