@@ -193,7 +193,7 @@ sub-tags.
 
 ```python
 <<write source files to disk>>=
-for path_file, content_file in parsed_file_data.items():
+for path_file, content_file in data_file_resolved.items():
   <<create dir structure if missing>>
   <<write content to filepath>>
 @
@@ -210,7 +210,7 @@ import sys
 def main(args):
   for filename in args:
     \<\<parse and resolve tags\>\>
-    for path_file, content_file in parsed_file_data.items():
+    for path_file, content_file in data_file_resolved.items():
       \<\<create dir structure if missing\>\>
       \<\<write content to filepath\>\>
 
@@ -239,11 +239,12 @@ The following defines regular expression matches for a regular tag, a
 defining or appending tag, and a match for a tag-scope.
 
 ```python
-<<parse and resolve tags>>=
+<<defined regexes>>=
 # Define regular expression matches for tags and scopes.
 re_tag_match = "\<\<.*?\>\>"
 re_tag_def_match = f"{re_tag_match}[+=]"
-re_tag_scope = fr"({re_tag_def_match})(.*?)\at"
+re_newline = r"[\\n\\r]"
+re_tag_scope = fr"({re_tag_def_match})(.*?){re_newline}*\at"
 @
 ```
 
@@ -253,9 +254,10 @@ make the `.*` match include newlines, which is needed to capture the whole
 scope.
 
 ```python
-<<parse and resolve tags>>+
+<<parse and resolve tags>>=
+<<defined regexes>>
 data_file = open(filename).read()
-tag_scopes_in_data = re.findall(re_tag_scope, data_file, re.DOTALL)
+data_tag_scopes = re.findall(re_tag_scope, data_file, re.DOTALL)
 @
 ```
 
@@ -265,34 +267,169 @@ stripping the last character and concatenating their scopes into another
 dictionary works fine.
 
 First, create a dictionary keyed on the tag-names, with a value of the empty
-string `""`. Since the tags are on the form `\<\<tag-name\>\>c` where `c` is an
+string `""`. Since the tags are on the form `<\<tag-name>\>c` where `c` is an
 additional character stripping the first two characters and the last three
-with: `tag[2:-3]` results in `tag-name` being returned.
+with: `tag[0:-1]` results in `<\<tag-name>\>` being returned.
 
 ```python
 <<parse and resolve tags>>+
-#print(tag_scopes_in_data)
-tags_concatenated = {k[2:-3]:"" for k,s in tag_scopes_in_data}
-print(tags_concatenated)
+data_concatenated_tags = {k[0:-1]:"" for k,s in data_tag_scopes}
 @
 ```
 
+Iterate through the different tags and append them to the corresponding string.
+
 ```python
 <<parse and resolve tags>>+
-#for tag in tag_scopes_in_data:
-#  print(tag)
-parsed_file_data = {}
+for tag, data in data_tag_scopes:
+  tag_stripped = tag[0:-1]
+  data_concatenated_tags[tag_stripped] += data
 @
 ```
+
+### Resolving nested tags.
+
+Since there is no limit on the number of number of possible nested tags, the
+substitution process needs to keep going until there are no new changes.
+
+```python
+<<parse and resolve tags>>+
+# Re-use the data_concatenated_tags dictionary.
+data_file_resolved = data_concatenated_tags
+while True:
+  <<hash the current dictionary>>
+  <<substitute the current visible tags>>
+  <<re-hash and break if nothing changed>>
+<<strip tags in resolved dict>>
+@
+```
+
+For this purpose, hashing naively, using the built-in `hash()` and `str()`
+methods works fine.
+
+```python
+<<hash the current dictionary>>=
+hash_before = hash(str(data_file_resolved))
+@
+```
+
+Iterate over all the current tags and do the following.
+
+```python
+<<substitute the current visible tags>>=
+for tag, data in data_file_resolved.items():
+  <<extract indentation and nested tags>>
+  <<iterate over and substitute found tags>>
+  <<write data back to dictionary>>
+@
+```
+
+Match and capture any leading whitespace, then match and capture the tag. If
+there are any trailing whitespace, match them but discard it.
+
+```python
+<<extract indentation and nested tags>>=
+indent_and_tags = re.findall(
+  f"({re_whitespace}*)({re_tag_match}){re_whitespace}*", data
+)
+@
+```
+
+Check if there is data that should replace the tag. If the data exists,
+add the indentation for the tag to each line of the new data. Update the `data`
+variable with the substituted data.
+
+```python
+<<iterate over and substitute found tags>>=
+for indent, tag_to_replace in indent_and_tags:
+  data_replace = data_file_resolved.get(tag_to_replace)
+  if not data_replace:
+    continue
+  data_replace = os.linesep.join(
+    [indent+line for line in data_replace.strip().splitlines()]
+  )
+  data = re.sub(f"{re_whitespace}*{tag_to_replace}", data_replace, data)
+@
+```
+
+Write the updated data back to the `data_file_resolved` dictionary.
+
+```python
+<<write data back to dictionary>>=
+data_file_resolved[tag] = data
+@
+```
+
+Don't forget to define `re_whitespace` since it is used above.
+
+```python
+<<defined regexes>>+
+re_whitespace = r"[ \\t]"
+@
+```
+
+Re-hash the updated dictionary and break if nothing has changed.
+
+```python
+<<re-hash and break if nothing changed>>=
+hash_after = hash(str(data_file_resolved))
+if hash_after == hash_before:
+  break
+@
+```
+
+Strip the tags and avoid including any regular expression read from non-source
+or bootstrapping code.
+
+```python
+<<strip tags in resolved dict>>=
+dict_new = {}
+for tag, data in data_file_resolved.items():
+  if '*' in tag:
+    continue
+  tag_stripped = tag[2:-2]
+  dict_new[tag_stripped] = data
+data_file_resolved = dict_new
+@
+```
+
+### Writing to disk.
+
+Anything that has a `.` is deemed to be a file, otherwise continue.
 
 ```python
 <<create dir structure if missing>>=
-pass
+name_file = os.path.basename(path_file)
+if not '.' in name_file:
+  continue
 @
 ```
 
+Iterating over the dictionary, check that the directories in the file path (if
+there are any) exists, otherwise create them.
+
+```python
+<<create dir structure if missing>>=
+path_dir = os.path.dirname(path_file)
+if path_dir and not os.path.isdir(path_dir):
+  os.makedirs(path_dir)
+@
+```
+
+In order to make this work, import the `os` module.
+
+```python
+<<import modules>>+
+import os
+@
+```
+
+Finally, write the data to disk.
+
 ```python
 <<write content to filepath>>=
+with open(path_file, 'w') as fh:
+  fh.write(content_file.strip()+os.linesep)
 @
 ```
 
