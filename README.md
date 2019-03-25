@@ -16,7 +16,7 @@ This is the repository for **litbop** -- **lit**erate **bo**otstrapped **p**ytho
 ### Step-by-step quickstart:
   1. Make sure that `python` (>3.6) is available.
   2. Run `python3 README.md`
-  3. Run `python3 out/litbop_bootsrapped.py <literate-text-file(s)>`
+  3. Run `./litbop <literate-text-file(s)>`
 
 ### Write literate code:
 
