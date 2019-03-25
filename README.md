@@ -399,8 +399,7 @@ Anything that has a `.` is deemed to be a file, otherwise continue.
 
 ```python
 <<create dir structure if missing>>=
-name_file = os.path.basename(path_file)
-if not '.' in name_file:
+if not '.' in path_file:
   continue
 @
 ```
