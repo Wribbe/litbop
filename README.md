@@ -267,23 +267,32 @@ stripping the last character and concatenating their scopes into another
 dictionary works fine.
 
 First, create a dictionary keyed on the tag-names, with a value of the empty
-string `""`. Since the tags are on the form `<<tag-name>>c` where `c` is an
+list `[]`. Since the tags are on the form `<<tag-name>>c` where `c` is an
 additional character stripping the first two characters and the last three
 with: `tag[0:-1]` results in `<<tag-name>>` being returned.
 
 ```python
 <<parse and resolve tags>>+
-data_concatenated_tags = {k[0:-1]:"" for k,s in data_tag_scopes}
+data_concatenated_tags = {k[0:-1]:[] for k,s in data_tag_scopes}
 @
 ```
 
-Iterate through the different tags and append them to the corresponding string.
+Iterate through the different tags and append them to the corresponding list.
 
 ```python
 <<parse and resolve tags>>+
 for tag, data in data_tag_scopes:
   tag_stripped = tag[0:-1]
-  data_concatenated_tags[tag_stripped] += data
+  data_concatenated_tags[tag_stripped].append(data)
+@
+```
+
+Create strings of all the lists by `join`ing with `os.linesep`.
+
+```python
+<<parse and resolve tags>>+
+for tag, lines in data_concatenated_tags.items():
+  data_concatenated_tags[tag] = os.linesep.join(lines)
 @
 ```
 
