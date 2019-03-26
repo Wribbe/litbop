@@ -10,7 +10,7 @@ Set up executable variant based on `libminify` library.
 #!/usr/bin/env python3
 import sys
 
-from libs import libminify
+from parser.lib import libminify
 
 if __name__ == "__main__":
   filename = sys.argv[1:][0]
@@ -32,5 +32,13 @@ Add `bin` directory to `.gitignore.`.
 ```shell
 <<.gitignore, 'a'>>=
 bin
+@
+```
+
+Add the actual library file.
+
+```python
+<<./parser/lib/libminipy.py>>=
+pass
 @
 ```
