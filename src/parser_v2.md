@@ -15,6 +15,7 @@ def parse(data):
   <<regexes>>
   <<find tags and scopes>>
   <<consolidate tags>>
+  <<resolve nested tags>>
   <<parse and process tags>>
   <<write data to disk>>
 @
