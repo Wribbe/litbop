@@ -15,7 +15,7 @@ def parse(data):
   <<regexes>>
   <<find tags and scopes>>
   <<consolidate tags>>
-  <<resolve nested tags>>
+#  <<resolve nested tags>>
   <<parse and process tags>>
   <<write data to disk>>
 @
@@ -114,13 +114,14 @@ list_actionable_tags = []
 @
 ```
 
-Defining the stub for the first helper method, to be resolved later:
+Define the stub for the first helper method, to be resolved later:
 
 ```python
 <<helper_process_tag>>=
 def process_tag(tag):
-  <<identify tag type>>
-  <<proceed with doing the correct thing>>
+  pass
+#  <<identify tag type>>
+#  <<proceed with doing the correct thing>>
 @
 ```
 
@@ -133,6 +134,39 @@ as expected in a multi line context.
 ```python
 <<find tags and scopes>>=
 list_tags_and_scopes = re.findall(re_tag_scope, data, re.DOTALL+re.MULTILINE)
+@
+```
+
+### Consolidating tags into one scope.
+
+Apply previous method of appending scopes to an empty list in a
+dictionary keyed with all available tag definitions. Sort out all unique keys
+in `list_tags_and_scopes` by using a `set` and then create a dictionary with
+empty lists, keyed on each unique tag using `dictionary-comprehension`.
+
+```python
+<<consolidate tags>>=
+tags_unique = set([key for key,_ in list_tags_and_scopes])
+dict_consolidated_scopes = {tag:[] for tag in tags_unique}
+@
+```
+
+Iterate over all the tags and data in `list_tags_and_scopes` and add them to
+`dict_consolidated_scopes`.
+
+```python
+<<consolidate tags>>+
+for tag, data_scope in list_tags_and_scopes:
+  dict_consolidated_scopes[tag].append(data_scope)
+@
+```
+
+Use `os.linesep.join()` to concatenate the appended parts into a single string.
+
+```python
+<<consolidate tags>>+
+for tag, lines in dict_consolidated_scopes.items():
+  dict_consolidated_scopes[tag] = os.linesep.join(lines)
 @
 ```
 
