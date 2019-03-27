@@ -102,12 +102,12 @@ This will result in the text `.gitignore` being written to the file
 bit redundant at the moment, but we'll get back to this later.
 
 The main goal is to write a more readable version of the bootstrapping code
-defined at the end of the document to the file `./parser/litbop_bootstrapped.py`,
+defined at the end of the document to the file `./bin/litbop_bootstrapped`,
 using litbop and literal programming. First, lets define the file itself
 together with its shebang, docstring and general structure.
 
 ```python
-<<parser/litbop_bootstrapped.py>>=
+<<./bin/litbop_bootstrapped>>=
 #!/usr/bin/env python3
 """ Readable version of litbop bootstrapper code. """
 <<import modules>>
@@ -124,7 +124,7 @@ if __name__ == "__main__":
 @
 ```
 
-Notice the `parser/` part of the previously defined tag, litbop accepts any *nix
+Notice the `./bin/` part of the previously defined tag, litbop accepts any *nix
 path on the format `<dir1>/.../<dirN>/<file>`, creating any missing
 directories. If the file defined in the path already exists, litbop will
 replace it without warning.
@@ -139,7 +139,7 @@ sort it out.
 
 Tags ending with `=` are definitions. The parser will take everything between
 the `=` and `@` to mean the definition of the tagname,
-`parser/litbop_bootstrapped.py` in this case. Tags without a trailing `=` or `+`
+`bin/litbop_bootstrapped` in this case. Tags without a trailing `=` or `+`
 are substitution tags, and the parser will try to replace them with their
 corresponding definition. If there is no definition for a tag, the unmodified
 tag will be written to file without substitution.
@@ -151,14 +151,14 @@ the ignore file in order to avoid committing generated code to the repository.
 
 ```python
 <<.gitignore>>+
-parser/
+litbop
 @
 ```
 
 The complete content of the `.gitignore` is now defined as:
 ```
 .gitignore
-parser/
+litbop
 ```
 
 Any tag with a trailing `+` will append to a previously defined tag with the same
@@ -201,7 +201,7 @@ for path_file, content_file in data_file_resolved.items():
 ```
 
 Running `python README.md` right now, together with `cat
-parser/litbop_bootstrapped.py` would produce the following output:
+bin/litbop_bootstrapped` would produce the following output:
 
 ```python
 #!/usr/bin/env python3
@@ -357,7 +357,7 @@ for indent, tag_to_replace in indent_and_tags:
   data_replace = os.linesep.join(
     [indent+line for line in data_replace.strip().splitlines()]
   )
-  data = re.sub(f"{re_whitespace}*{tag_to_replace}", data_replace, data)
+  data = re.sub(f"({re_whitespace}*){tag_to_replace}", data_replace, data)
 @
 ```
 
@@ -447,15 +447,8 @@ Define an `exec` tag, this will be executed by the parser.
 
 ```shell
 <<exec>>=
-chmod +x parser/litbop_bootstrapped.py
-ln -rsf parser/litbop_bootstrapped.py litbop
-@
-```
-Add symbolic link to `.gitignore` file.
-
-```shell
-<<.gitignore>>+
-litbop
+chmod +x ./bin/litbop_bootstrapped
+ln -rsf ./bin/litbop_bootstrapped ./bin/litbop
 @
 ```
 
