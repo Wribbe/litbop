@@ -2,12 +2,13 @@
 
 ### Additions - Todo:
 * [ ] - Support `<<path_file, 'a'>>` syntax for appending to existing files.
-* [ ] - Support dynamic variables with `<<{{ignore_file}}, 'w'>>` syntax.
+* [ ] - Support dynamic variables with `<<{{gnore_file}}, 'w'>>` syntax.
+* [ ] - If multiple `<<tag>>=`, the last one should take precedence.
 
 ### Defining the main structure of the lib.
 
 ```python
-<<./parser/lib/liblitbop2.py>>=
+<<./litbop/liblitbop.py>>=
 <<imports>>
 <<global definitions>>
 <<helper methods>>
@@ -21,17 +22,11 @@ def parse(data):
 @
 ```
 
-Make sure there is a `__init__.py` file in the `lib` and `parser` directories.
+Make sure there is a `__init__.py` file in the `litbop` directory.
 
 ```python
-<<./parser/lib/__init__.py>>=
-# File needed to make lib a module.
-@
-```
-
-```python
-<<./parser/__init__.py>>=
-# File needed to make parser a module.
+<<./litbop/__init__.py>>=
+# File needed to make litbop a module.
 @
 ```
 
@@ -170,21 +165,51 @@ for tag, lines in dict_consolidated_scopes.items():
 @
 ```
 
+Import the `os` module.
+
+```python
+<<imports>>+
+import os
+@
+```
+
 ### Set up executable version.
 
 Define the executable source.
 
 ```python
 <<./bin/litbop2>>=
-#!/usr/bin/env python3
+#!<<virt_python>>
 
 import sys
 
-from parser.lib import liblitbop2
+from litbop import liblitbop
 
 if __name__ == "__main__":
   filename = sys.argv[1:][0]
-  print(liblitbop2.parse(open(filename, 'r').read()))
+  print(liblitbop.parse(open(filename, 'r').read()))
+@
+```
+
+### Configure setup.py file.
+
+```python
+<<./litbop/setup.py>>=
+import setuptools
+
+setuptools.setup(
+  name="litbop",
+  version="<<version>>",
+  author="Stefan Eng",
+  author_email="eng_steff@hotmail.com",
+  packages=setuptools.find_packages(),
+  description="Self-hosted literate programming toolbox",
+  classifers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: Unix",
+  ]
+)
 @
 ```
 
@@ -193,5 +218,51 @@ Add executable permissions to the script.
 ```shell
 <<exec>>=
 chmod +x ./bin/litbop2
+@
+```
+
+Create virtual environment if there isn't one.
+
+```shell
+<<exec>>+
+python -m venv <<dir_virtual_environment>>
+@
+```
+
+Upgrade the pip installation.
+
+```shell
+<<exec>>+
+<<virt_python>> -m pip install --upgrade pip
+@
+```
+
+Define path to virtual python executable.
+```shell
+<<virt_python>>=
+<<dir_virtual_environment>>/bin/python
+@
+```
+
+Define the name of the directory containing the virtual environment.
+```shell
+<<dir_virtual_environment>>=
+virt
+@
+```
+
+Install litbop into the virtual environment using the `-e` switch.
+
+```shell
+<<exec>>+
+<<virt_python>> -m pip install -e litbop
+@
+```
+
+Set the version.
+
+```python
+<<version>>=
+0.0.1
 @
 ```
