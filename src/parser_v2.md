@@ -178,7 +178,7 @@ import os
 Define the executable source.
 
 ```python
-<<./bin/litbop2>>=
+<<./litbop/litbop.py>>=
 #!./<<virt_python>>
 
 import sys
@@ -212,10 +212,18 @@ setuptools.setup(
 @
 ```
 
+Copy `litbop.py` to `./bin/litbop2`
+
+```shell
+<<exec>>+
+cp ./litbop/litbop.py ./bin/litbop2
+@
+```
+
 Add executable permissions to the script.
 
 ```shell
-<<exec>>=
+<<exec>>+
 chmod +x ./bin/litbop2
 @
 ```
