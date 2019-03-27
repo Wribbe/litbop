@@ -179,11 +179,10 @@ Define the executable source.
 
 ```python
 <<./bin/litbop2>>=
-#!<<virt_python>>
+#!./<<virt_python>>
 
 import sys
-
-from litbop import liblitbop
+import liblitbop
 
 if __name__ == "__main__":
   filename = sys.argv[1:][0]
