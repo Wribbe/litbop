@@ -228,19 +228,27 @@ chmod +x ./bin/litbop2
 @
 ```
 
+Create script that handles setup of virtual environment.
+
+```python
+<<./scripts/setup_virtualenv.py>>=
+#!/usr/bin/env python3
+import os
+import venv
+import subprocess
+path_dir_virt = "<<dir_virtual_environment>>"
+if not os.path.isdir(path_dir_virt):
+  venv.create(path_dir_virt, with_pip=True)
+  subprocess.call("<<virt_python>> -m pip install --upgrade pip".split())
+  subprocess.call("<<virt_python>> -m pip install -e litbop".split())
+@
+```
+
 Create virtual environment if there isn't one.
 
 ```shell
 <<exec>>+
-python -m venv <<dir_virtual_environment>>
-@
-```
-
-Upgrade the pip installation.
-
-```shell
-<<exec>>+
-<<virt_python>> -m pip install --upgrade pip
+python scripts/setup_virtualenv.py
 @
 ```
 
@@ -255,14 +263,6 @@ Define the name of the directory containing the virtual environment.
 ```shell
 <<dir_virtual_environment>>=
 virt
-@
-```
-
-Install litbop into the virtual environment using the `-e` switch.
-
-```shell
-<<exec>>+
-<<virt_python>> -m pip install -e litbop
 @
 ```
 
