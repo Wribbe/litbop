@@ -482,21 +482,15 @@ Might have gotten a bit carried away when trying to minimize it, one should
 probably not do __*ANYTHING*__ of what is done below, don't use as reference!
 
 ```python
-import re, os; from re import S,M; from os.path import dirname as opd
-rs,rt,nj,d,rf=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read(),re.findall]
-dt={t:''.join(rf(f"{t}[+=]\s?(.*?)^@",d,S+M)) for t in rf(f"({rt}).*?^@",d,S+M)}
-while True:
-  dh = hash(str(dt))
-  for k,v in dt.items():
-    for i,t in [t for t in rf(f"({rs}*)({rt}){rs}?",v,S) if t[1] in dt]:
-      dt[k] = re.sub(f"{rs}*"+t,nj([i+l for l in dt[t].splitlines()]),dt[k])
-  if dh == hash(str(dt)):
-    dt = {k[2:-2]:v for k,v in dt.items() if '*' not in k}; break
-for dn,k,v in [(opd(k),k,v) for k,v in dt.items() if '.' in k]:
-  if dn and not os.path.isdir(dn):
-    os.makedirs(dn)
-  open(k,'w').write(v)
-import subprocess as sp; [sp.run(c.split()) for c in dt['exec'].splitlines()]
-```
-'''
-exec(''.join(open(__file__).readlines()[-18:-3]))
+import re, os; from re import S,M; from os.path import dirname as opd!rs,rt,nj
+,d,rf=[r"[ \t]","<<.*?>>",'\n'.join,open(__file__).read(),re.findall]!dt={t:''
+.join(rf(f"{t}[+=]\s?(.*?)^@",d,S+M)) for t in rf(f"({rt}).*?^@",d,S+M)}!while
+ True:!qdh = hash(str(dt))!qfor k,v in dt.items():!qqfor i,t in [t for t in rf
+(f"({rs}*)({rt}){rs}?",v,S) if t[1] in dt]:!qqqdt[k] = re.sub(f"{rs}*"+t,nj([i
++l for l in dt[t].replace('\\', '\\\\').splitlines()]),dt[k])!qif dh == hash(s
+tr(dt)):!qqdt = {k[2:-2]:v for k,v in dt.items() if '*' not in k}; break!for d
+n,k,v in [(opd(k),k,v) for k,v in dt.items() if '.' in k]:!qif dn and not os.p
+ath.isdir(dn):!qqos.makedirs(dn)!qopen(k,'w').write(v)!import subprocess as sp
+; [sp.run(c.split()) for c in dt['exec'].splitlines()]!```'''
+d=open(__file__).read()[-876:-110];d=d.replace('q','  ').replace('\n','')\
+.replace('!','\n');exec(d)
