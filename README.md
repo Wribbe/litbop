@@ -357,6 +357,8 @@ for indent, tag_to_replace in indent_and_tags:
   data_replace = os.linesep.join(
     [indent+line for line in data_replace.strip().splitlines()]
   )
+  # Re-add escaped backslashes.
+  data_replace = data_replace.replace("\\", "\\\\")
   data = re.sub(f"({re_whitespace}*){tag_to_replace}", data_replace, data)
 @
 ```

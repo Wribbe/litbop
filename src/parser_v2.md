@@ -18,7 +18,7 @@ def parse(data):
   <<regexes>>
   <<find tags and scopes>>
   <<consolidate tags>>
-#  <<resolve nested tags>>
+  <<resolve nested tags>>
   <<parse and process tags>>
   <<write data to disk>>
 @
@@ -57,7 +57,7 @@ Use the globals to define the regular expressions.
 ```python
 <<regexes>>=
 re_tag_usage = f"{START_TAG}.*?{END_TAG}"
-re_tag_scope = f"^({re_tag_usage})[+=]\\s*(.*?)\\s*^{END_SCOPE}"
+re_tag_scope = f"^({re_tag_usage})[+=]\s*(.*?)\s*^{END_SCOPE}"
 @
 ```
 
@@ -164,6 +164,7 @@ Use `os.linesep.join()` to concatenate the appended parts into a single string.
 <<consolidate tags>>+
 for tag, lines in dict_consolidated_scopes.items():
   dict_consolidated_scopes[tag] = os.linesep.join(lines)
+print(dict_consolidated_scopes)
 @
 ```
 
@@ -174,6 +175,69 @@ Import the `os` module.
 import os
 @
 ```
+
+### Resolve nested tags.
+
+Since there could be an arbitrary nesting length a `while True` is suitable.
+
+```python
+<<resolve nested tags>>=
+<<get_start_hash>>
+while True:
+  <<substitute_tags_with_definitions>>
+  <<re_hash_and_compare>>
+@
+```
+
+Using simples hashing available:
+
+```python
+<<get_start_hash>>=
+hash_prev = hash(str(dict_consolidated_scopes))
+@
+```
+
+Re-hash and update if there are changes, otherwise break the `while` loop.
+
+```python
+<<re_hash_and_compare>>=
+hash_current = hash(str(dict_consolidated_scopes))
+if hash_prev == hash_current:
+  break
+hash_prev = hash_current
+@
+```
+
+Identify sub-tasks present within the tag-substitution:
+
+```python
+<<substitute_tags_with_definitions>>=
+for tag, definition in dict_consolidated_scopes.items():
+  <<get all substitutable tags and their indentation in current definition>>
+  for indentation, tag in tags_in_current_def:
+    <<substitute tag in definition, keeping indentation>>
+@
+```
+
+Pull out all the tags present in the current definition together with their
+indentation.
+
+```python
+<<get all substitutable tags and their indentation in current definition>>=
+tags_in_current_def = re.findall(f"(\s*)({re_tag_usage})", definition)
+@
+```
+
+Filter out anything that does not have an definition.
+
+```python
+<<get all substitutable tags and their indentation in current definition>>+
+tags_in_current_def = [
+  tuple for tuple in tags_in_current_def if tuple[1] in dict_consolidated_scopes
+]
+@
+```
+
 
 ### Set up executable version.
 
