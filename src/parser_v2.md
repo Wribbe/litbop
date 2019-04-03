@@ -2,8 +2,10 @@
 
 ### Additions - Todo:
 * [ ] - Support `<<path_file, 'a'>>` syntax for appending to existing files.
-* [ ] - Support dynamic variables with `<<{{gnore_file}}, 'w'>>` syntax.
+* [ ] - Support dynamic variables with `<<{{ignore_file}}, 'w'>>` syntax.
 * [ ] - If multiple `<<tag>>=`, the last one should take precedence.
+* [ ] - Figure out why 2x escapes are needed `\\\\s`, optimally no
+        escapes needed, `\s`.
 
 ### Defining the main structure of the lib.
 
