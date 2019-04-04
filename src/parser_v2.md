@@ -4,7 +4,7 @@
 * [ ] - Support `<<path_file, 'a'>>` syntax for appending to existing files.
 * [ ] - Support dynamic variables with `<<{{ignore_file}}, 'w'>>` syntax.
 * [ ] - If multiple `<<tag>>=`, the last one should take precedence.
-* [ ] - Figure out why 2x escapes are needed `\\\\s`, optimally no
+* [x] - Figure out why 2x escapes are needed `\\\\s`, optimally no
         escapes needed, `\s`.
 
 ### Defining the main structure of the lib.
@@ -88,6 +88,7 @@ should involve no additional poking.
 
 ```python
 <<write data to disk>>=
+print(dict_consolidated_scopes)
 for tag in list_actionable_tags:
   process_tag(tag)
 @
@@ -164,7 +165,6 @@ Use `os.linesep.join()` to concatenate the appended parts into a single string.
 <<consolidate tags>>+
 for tag, lines in dict_consolidated_scopes.items():
   dict_consolidated_scopes[tag] = os.linesep.join(lines)
-print(dict_consolidated_scopes)
 @
 ```
 
@@ -224,7 +224,15 @@ indentation.
 
 ```python
 <<get all substitutable tags and their indentation in current definition>>=
-tags_in_current_def = re.findall(f"(\s*)({re_tag_usage})", definition)
+tags_in_current_def = re.findall(f"({re_whitespace}*)({re_tag_usage})", definition)
+@
+```
+
+Add whitespace regular expression excluding newlines.
+
+```python
+<<regexes>>+
+re_whitespace = "[ \\t]"
 @
 ```
 
@@ -237,6 +245,38 @@ tags_in_current_def = [
 ]
 @
 ```
+
+Create the data that should be substituted in place of the tag.
+
+```python
+<<substitute tag in definition, keeping indentation>>=
+data_substitution = dict_consolidated_scopes.get(tag).splitlines()
+data_substitution = [f"{indentation}{line}" for line in data_substitution]
+data_substitution = os.linesep.join(data_substitution)
+@
+```
+
+Re-escape any `\` that are present in the data.
+
+```python
+<<substitute tag in definition, keeping indentation>>+
+data_substitution = data_substitution.replace("\\", "\\\\")
+@
+```
+
+Substitute the tag using `re.sub`.
+
+```python
+<<substitute tag in definition, keeping indentation>>+
+dict_consolidated_scopes[tag] = re.sub(
+  f"{re_whitespace}*{tag}",
+  data_substitution,
+  dict_consolidated_scopes[tag]
+)
+@
+```
+
+
 
 
 ### Set up executable version.
