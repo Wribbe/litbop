@@ -258,7 +258,7 @@ data_substitution = os.linesep.join(data_substitution)
 @
 ```
 
-Re-escape any `\` that are present in the data.
+Re-escape any backslashes that are present in the data.
 
 ```python
 <<substitute tag in definition, keeping indentation>>+
