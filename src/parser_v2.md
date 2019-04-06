@@ -314,10 +314,31 @@ TAG_EXEC = "exec"
 The helper method `error()` is also needed.
 
 ```python
-<<helper_methods>>+
+<<helper methods>>+
 <<helper_error>>
 @
 ```
+
+Define the `error()` method.
+
+```python
+<<helper_error>>=
+def error(message):
+  print(f"{OUT_ERR} {message}", file=sys.stderr)
+@
+```
+
+Add the `OUT_ERR` global and import `sys`.
+
+```python
+<<global definitions>>+
+OUT_ERR = "Error:"
+@
+<<imports>>+
+import sys
+@
+```
+
 
 Continuing with processing the tag depending on the identified type.
 
