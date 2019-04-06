@@ -277,7 +277,7 @@ dict_consolidated_scopes[tag] = re.sub(
 )
 @
 ```
-### Strip and sort out the tags that are actionable.
+Strip and sort out the tags that are actionable.
 
 ```python
 <<parse and process tags>>+
