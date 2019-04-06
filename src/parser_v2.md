@@ -293,6 +293,29 @@ identified.
 
 ```python
 <<identify tag type>>=
+if tag.startswith('.') or '/' in tag:
+  type_tag = TAG_FILE
+elif tag == TAG_EXEC:
+  type_tag = TAG_EXEC
+else:
+  error(f"Could not resolve tag: {tag}")
+@
+```
+
+This approach needs additional globals;
+
+```python
+<<global definitions>>+
+TAG_FILE = "tag_file"
+TAG_EXEC = "exec"
+@
+```
+
+The helper method `error()` is also needed.
+
+```python
+<<helper_methods>>+
+<<helper_error>>
 @
 ```
 
