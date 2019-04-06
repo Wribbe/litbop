@@ -90,7 +90,7 @@ should involve no additional poking.
 <<write data to disk>>=
 print(dict_consolidated_scopes)
 for tag in list_actionable_tags:
-  process_tag(tag)
+  process_tag(*tag)
 @
 ```
 
@@ -116,8 +116,10 @@ Define the stub for the first helper method, to be resolved later:
 
 ```python
 <<helper_process_tag>>=
-def process_tag(tag):
-  pass
+def process_tag(tag, *args):
+  print(tag)
+  if args:
+    print(f"Got args {args}")
 #  <<identify tag type>>
 #  <<proceed with doing the correct thing>>
 @
@@ -275,9 +277,17 @@ dict_consolidated_scopes[tag] = re.sub(
 )
 @
 ```
+### Strip and sort out the tags that are actionable.
 
-
-
+```python
+<<parse and process tags>>+
+for tag in dict_consolidated_scopes:
+  tag = tag[2:-2] # Remove the '<<' and '>>'.
+  if '.' in tag or tag == "exec":
+    toks = [t.strip() for t in tag.split(',')]
+    list_actionable_tags.append(toks)
+@
+```
 
 ### Set up executable version.
 
@@ -347,6 +357,14 @@ if not os.path.isdir(path_dir_virt):
   venv.create(path_dir_virt, with_pip=True)
   subprocess.call("<<virt_python>> -m pip install --upgrade pip".split())
   subprocess.call("<<virt_python>> -m pip install -e litbop".split())
+@
+```
+
+Append `scripts` dir to `.gitignore`.
+
+```shell
+<<.gitignore, 'a'>>+
+scripts
 @
 ```
 
