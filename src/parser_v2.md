@@ -117,11 +117,8 @@ Define the stub for the first helper method, to be resolved later:
 ```python
 <<helper_process_tag>>=
 def process_tag(tag, *args):
-  print(tag)
-  if args:
-    print(f"Got args {args}")
-#  <<identify tag type>>
-#  <<proceed with doing the correct thing>>
+  <<identify tag type>>
+  <<proceed with doing the correct thing>>
 @
 ```
 
@@ -286,6 +283,23 @@ for tag in dict_consolidated_scopes:
   if '.' in tag or tag == "exec":
     toks = [t.strip() for t in tag.split(',')]
     list_actionable_tags.append(toks)
+@
+```
+
+### Process the relevant tags.
+
+Going back to define the `process_tag` method, beginning with how a tag is
+identified.
+
+```python
+<<identify tag type>>=
+@
+```
+
+Continuing with processing the tag depending on the identified type.
+
+```python
+<<proceed with doing the correct thing>>=
 @
 ```
 
