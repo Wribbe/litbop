@@ -88,7 +88,6 @@ should involve no additional poking.
 
 ```python
 <<write data to disk>>=
-print(dict_consolidated_scopes)
 for tag in list_actionable_tags:
   process_tag(*tag)
 @
@@ -325,6 +324,7 @@ Define the `error()` method.
 <<helper_error>>=
 def error(message):
   print(f"{OUT_ERR} {message}", file=sys.stderr)
+  sys.exit(-1)
 @
 ```
 
@@ -339,13 +339,32 @@ import sys
 @
 ```
 
-
 Continuing with processing the tag depending on the identified type.
 
 ```python
 <<proceed with doing the correct thing>>=
+  <<tag_processing_helpers>>
+tag_methods = {
+  TAG_FILE: process_file,
+  TAG_EXEC: process_exec,
+}
+tag_methods[type_tag](tag, args)
 @
 ```
+
+Add the tag processing methods.
+
+```python
+<<tag_processing_helpers>>=
+def process_file(tag, args):
+  print(tag)
+def process_exec(tag, args):
+  print(tag)
+@
+```
+
+
+
 
 ### Set up executable version.
 
