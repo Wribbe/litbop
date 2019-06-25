@@ -3,7 +3,7 @@
 
 This is the repository for **litbop** -- **lit**erate **bo**otstrapped **p**ython.
 
-**litpop** is a:
+**litbop** is a:
 * Self-hosting<sup>[wiki](https://en.wikipedia.org/wiki/Self-hosting)</sup>
 * Language agnostic<sup>[stackExchange](https://softwareengineering.stackexchange.com/a/28498)</sup>
 * Literate programming<sup>[wiki](https://en.wikipedia.org/wiki/Literate_programming)</sup> toolbox
